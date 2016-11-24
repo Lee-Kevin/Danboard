@@ -1,10 +1,5 @@
 /* Sweep
- by BARRAGAN <http://barraganstudio.com>
- This example code is in the public domain.
 
- modified 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Sweep
 */
 
 #define Analog1y A0
@@ -13,9 +8,12 @@
 #define Analog2y A2
 #define Analog2x A3
 
-#define AXIS_X1_MIDDLE 335
-#define AXIS_X1_LEFT   170
-#define AXIS_X1_RIGHT  500
+#define ButtonPIN1 4
+#define ButtonPIN2 7
+
+#define AXIS_X1_MIDDLE 510
+#define AXIS_X1_LEFT   265
+#define AXIS_X1_RIGHT  755
 
 #define AXIS_Y1_MIDDLE 510
 #define AXIS_Y1_LEFT   260
@@ -26,8 +24,8 @@
 #define AXIS_X2_RIGHT  760
 
 #define AXIS_Y2_MIDDLE 510
-#define AXIS_Y2_LEFT   260
-#define AXIS_Y2_RIGHT  760
+#define AXIS_Y2_LEFT   265
+#define AXIS_Y2_RIGHT  755
 
 
 #define HEAD  0xAA
@@ -83,24 +81,31 @@ void loop() {
     int sensorValue2 = analogRead(A1);    
     int sensorValue3 = analogRead(A2);
     int sensorValue4 = analogRead(A3);
-    for(uint8_t i=0; i<4; i++){
-        int sensor = analogRead(AnalogPort[i]);
-        if (sensor> AXIS_X1_RIGHT) {
-            sensor = AXIS_X1_RIGHT;
+    if(HIGH == digitalRead(ButtonPIN1)) {
+        int sensor = analogRead(AnalogPort[0]);
+        data[1] = 4;
+        SensorNew[0] = map(sensor,AXIS_X1_LEFT,AXIS_X1_RIGHT,0,100);
+        data[2] = SensorNew[0];
+        Serial.write(data,4);
+    } else{
+        for(uint8_t i=0; i<4; i++){
+            int sensor = analogRead(AnalogPort[i]);
+            if (sensor> AXIS_X1_RIGHT) {
+                sensor = AXIS_X1_RIGHT;
+            }
+            if (sensor < AXIS_X1_LEFT) {
+                sensor = AXIS_X1_LEFT;
+            }
+            SensorNew[i] = map(sensor,AXIS_X1_LEFT,AXIS_X1_RIGHT,0,100);
+            data[1] = i;
+            data[2] = SensorNew[i];
+            
+            if(abs(SensorNew[i] - SensorOld[i]) > 0) {
+                Serial.write(data,4);
+            } 
+            SensorOld[i] = SensorNew[i];
         }
-        if (sensor < AXIS_X1_LEFT) {
-            sensor = AXIS_X1_LEFT;
-        }
-        SensorNew[i] = map(sensor,AXIS_X1_LEFT,AXIS_X1_RIGHT,0,100);
-        data[1] = i;
-        data[2] = SensorNew[i];
-        
-        if(abs(SensorNew[i] - SensorOld[i]) > 0) {
-            Serial.write(data,4);
-        } 
-        SensorOld[i] = SensorNew[i];
     }
-
     // Serial.print("The X and Y coordinate is:");
     // Serial.print(sensorValue1, DEC);
     // Serial.print(",");
@@ -112,4 +117,5 @@ void loop() {
     // Serial.println(" ");
     delay(20);
 }
+
 
