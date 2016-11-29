@@ -1,5 +1,6 @@
-/* Sweep
-
+/* 
+Robot Controller side 
+Jiankai.li
 */
 
 #define Analog1y A0
@@ -26,6 +27,12 @@
 #define AXIS_Y2_MIDDLE 510
 #define AXIS_Y2_LEFT   265
 #define AXIS_Y2_RIGHT  755
+
+#define LEFTARM 0
+#define RIGHTARM 1
+#define NODEHEAD 2
+#define SHAKEHEAD 3 
+#define WAIST     4
 
 
 #define HEAD  0xAA
@@ -87,7 +94,32 @@ void loop() {
         SensorNew[0] = map(sensor,AXIS_X1_LEFT,AXIS_X1_RIGHT,0,100);
         data[2] = SensorNew[0];
         Serial.write(data,4);
-    } else{
+    } else if(HIGH == digitalRead(ButtonPIN2)) {
+        data[1] = LEFTARM;
+        for(uint8_t i=50; i>0; i--) {
+            data[2] = i;
+            Serial.write(data,4);
+            delay(20);
+        }
+        for(uint8_t j=0; j<2; j++) {
+            for(uint8_t i=0; i<25; i++) {
+                data[2] = i;
+                Serial.write(data,4);
+                delay(10);
+            }      
+            for(uint8_t i=25; i>0; i--) {
+                data[2] = i;
+                Serial.write(data,4);
+                delay(10);
+            } 
+       
+        }
+        for(uint8_t i=0; i<50; i++) {
+            data[2] = i;
+            Serial.write(data,4);
+            delay(10);
+        }
+    } else {
         for(uint8_t i=0; i<4; i++){
             int sensor = analogRead(AnalogPort[i]);
             if (sensor> AXIS_X1_RIGHT) {
@@ -100,10 +132,12 @@ void loop() {
             data[1] = i;
             data[2] = SensorNew[i];
             
-            if(abs(SensorNew[i] - SensorOld[i]) > 0) {
+            if(abs(SensorNew[i] - SensorOld[i]) > 1) {
                 Serial.write(data,4);
+                
             } 
             SensorOld[i] = SensorNew[i];
+            delay(15);
         }
     }
     // Serial.print("The X and Y coordinate is:");
@@ -115,7 +149,7 @@ void loop() {
     // Serial.print(",");
     // Serial.println(sensorValue4, DEC);
     // Serial.println(" ");
-    delay(20);
+    delay(30);
 }
 
 

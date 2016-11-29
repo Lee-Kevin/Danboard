@@ -1,31 +1,28 @@
-/* Sweep
- by BARRAGAN <http://barraganstudio.com>
- This example code is in the public domain.
+/* Robot
 
- modified 8 Nov 2013
- by Scott Fitzgerald
- http://www.arduino.cc/en/Tutorial/Sweep
+This is the Robot side code
+Jiankai.li
 */
 
 #include <Servo.h>
+#include <avr/wdt.h>
+#include <TimerOne.h>
 
-#define Analog A0
 
 #define NODHEAD 2
 #define NODHEAD_RANGE 20
-#define NODHEAD_ZERO  112
+#define NODHEAD_ZERO  120
 
-
-#define SHAKEHEAD 3
+#define SHAKEHEAD 7
 #define SHAKEHEAD_RANGE 20
 #define SHAKEHEAD_ZERO  100
 
 #define LEFTARM  4
-#define LEFTARM_RANGE 20
+#define LEFTARM_RANGE 70
 #define LEFTARM_ZERO  110
 
 #define RIGHTARM  5
-#define RIGHTARM_RANGE 20
+#define RIGHTARM_RANGE 70
 #define RIGHTARM_ZERO  70
 
 #define WAIST  6
@@ -79,6 +76,7 @@ boolean update = false;  // whether the string is complete
 
 void setup() {
     Serial.begin(115200);
+    
     myservo[0].attach(LEFTARM);  // attaches the servo on pin 9 to the servo object
     myservo[1].attach(RIGHTARM);  // attaches the servo on pin 9 to the servo object
     myservo[2].attach(NODHEAD);  // attaches the servo on pin 9 to the servo object
@@ -99,13 +97,19 @@ void setup() {
     urobot.ucdata[2] = NODHEAD_ZERO;
     urobot.ucdata[3] = SHAKEHEAD_ZERO;
     urobot.ucdata[4] = WAIST_ZERO;
+    
+    wdt_enable(WDTO_2S);
+ 
+    Timer1.initialize(1500000); // set a timer of length 1000000 microseconds 1 second
+    Timer1.attachInterrupt( timerIsrFeedFog ); // attach the service routine here
+    wdt_reset();
 }
 
 void loop() {
     
     if (true == update) {
         // myservo[target].write(urobot.ucdata[target]);
-        Serial.println("update");
+        // Serial.println("update");
         myservo[0].write(urobot.ucdata[0]);
         myservo[1].write(urobot.ucdata[1]);
         myservo[2].write(urobot.ucdata[2]);
@@ -117,10 +121,13 @@ void loop() {
 
 void serialEvent() {
     while (Serial.available()) {
+        // char inChar = (char)Serial.read();
+        // Serial.write(inChar);
     // get the new byte:
+        
         uint8_t inChar = (char)Serial.read();
     // add it to the inputString:
-        Serial.print(inChar,HEX);
+        // Serial.write(inChar);
         switch(Status) {
         case WAIT_HEAD:
             if (HEAD == inChar ) {
@@ -152,4 +159,9 @@ void serialEvent() {
 
         }
     }
+}
+
+void timerIsrFeedFog()
+{
+    wdt_reset();
 }
