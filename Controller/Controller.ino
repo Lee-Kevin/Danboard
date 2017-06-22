@@ -2,6 +2,8 @@
 Robot Controller side 
 Jiankai.li
 */
+#include <avr/wdt.h>
+#include <SoftwareSerial.h>
 
 #define Analog1y A0
 #define Analog1x A1
@@ -37,6 +39,8 @@ Jiankai.li
 
 #define HEAD  0xAA
 #define END   0x55
+
+#define BaudRate 9600
 
 
 struct move {
@@ -74,10 +78,13 @@ uint8_t data[4];
 uint8_t SensorNew[4];
 uint8_t SensorOld[4];
 
+
+SoftwareSerial mySerial(2,3); // RX, TX
 // The data format is 0x
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(BaudRate);
+    mySerial.begin(BaudRate);
     data[0] = HEAD;
     data[3] = END;
 }
@@ -93,32 +100,34 @@ void loop() {
         data[1] = 4;
         SensorNew[0] = map(sensor,AXIS_X1_LEFT,AXIS_X1_RIGHT,0,100);
         data[2] = SensorNew[0];
-        Serial.write(data,4);
+        mySerial.write(data,4);
+        Serial.println("Send Data");
     } else if(HIGH == digitalRead(ButtonPIN2)) {
         data[1] = LEFTARM;
         for(uint8_t i=50; i>0; i--) {
             data[2] = i;
-            Serial.write(data,4);
+            mySerial.write(data,4);
             delay(20);
         }
         for(uint8_t j=0; j<2; j++) {
             for(uint8_t i=0; i<25; i++) {
                 data[2] = i;
-                Serial.write(data,4);
+                mySerial.write(data,4);
                 delay(10);
             }      
             for(uint8_t i=25; i>0; i--) {
                 data[2] = i;
-                Serial.write(data,4);
+                mySerial.write(data,4);
                 delay(10);
             } 
        
         }
         for(uint8_t i=0; i<50; i++) {
             data[2] = i;
-            Serial.write(data,4);
+            mySerial.write(data,4);
             delay(10);
         }
+        Serial.println("Send Data");
     } else {
         for(uint8_t i=0; i<4; i++){
             int sensor = analogRead(AnalogPort[i]);
@@ -133,7 +142,8 @@ void loop() {
             data[2] = SensorNew[i];
             
             if(abs(SensorNew[i] - SensorOld[i]) > 1) {
-                Serial.write(data,4);
+                mySerial.write(data,4);
+                Serial.println("Send Data");
                 
             } 
             SensorOld[i] = SensorNew[i];
