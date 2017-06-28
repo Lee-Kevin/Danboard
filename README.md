@@ -14,7 +14,7 @@ Danbo (ダンボー) is a fictional cardboard box robot character from Kiyohiko 
 
 I have already writen a fully guide about how to do this project step by step, you can click the photo below to view the document.
 
-[![](https://raw.githubusercontent.com/Lee-Kevin/Danboard/master/docs/readme.jpg)](https://github.com/Lee-Kevin/Danboard/blob/master/docs/readme.pdf)
+[![](https://raw.githubusercontent.com/Lee-Kevin/Danboard/master/docs/readme.jpg)](https://github.com/Lee-Kevin/Danboard/blob/master/docs/49.DIY%20a%20Christmas%20Remote%20Control%20Robot%20named%20Danboard.pdf)
 
 Of course you can also find this project on instructable website by click the following link.
 
